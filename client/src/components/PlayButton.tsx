@@ -18,7 +18,7 @@ export default function PlayButton() {
     <button
       // onClick={handlePlay}
       disabled={!connected}
-      className={`px-12 py-6 rounded-lg font-black text-2xl md:text-3xl text-white transition-all duration-200 neon-border pixel-font transform hover:scale-105 ${
+      className={`w-full sm:w-auto px-8 sm:px-12 py-4 sm:py-6 rounded-lg font-black text-lg sm:text-xl md:text-2xl lg:text-3xl text-white transition-all duration-200 neon-border pixel-font transform hover:scale-105 ${
         connected
           ? "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 pulse-neon"
           : "bg-gray-600 cursor-not-allowed opacity-50"

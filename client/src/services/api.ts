@@ -4,6 +4,8 @@ import type { LeaderboardResponse } from "../store/slices/leaderboardSlice"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
 
+console.log("API Base URL:", API_BASE_URL);
+
 // Generic Axios helper function
 const apiRequest = async <T>(url: string, config?: AxiosRequestConfig): Promise<T> => {
   try {

@@ -32,11 +32,11 @@ export const submitScore = asyncHandler(async (req: Request, res: Response) => {
     let rewardTx: string | null = null;
 
     if (score >= 70) {
-      rewardTx = await sendTestTokens(wallet, 100_000);
+      rewardTx = await sendTestTokens(wallet, 1_000_000);
     } else if (score >= 50) {
-      rewardTx = await sendTestTokens(wallet, 50_000);
+      rewardTx = await sendTestTokens(wallet, 500_000);
     } else if (score >= 30) {
-      rewardTx = await sendTestTokens(wallet, 20_000);
+      rewardTx = await sendTestTokens(wallet, 200_000);
     }
 
     res.status(200).json({
