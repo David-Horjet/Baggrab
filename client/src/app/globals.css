@@ -1,0 +1,168 @@
+@import url("@solana/wallet-adapter-react-ui/styles.css");
+@import 'tailwindcss';
+
+/* @layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-black text-white;
+  }
+} */
+
+@layer components {
+  .pixel-font {
+    font-family: "Courier New", "Monaco", "Menlo", "Consolas", monospace;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+  }
+
+  .neon-glow {
+    text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
+  }
+
+  .neon-border {
+    box-shadow: 0 0 5px currentColor, 0 0 10px currentColor, inset 0 0 5px currentColor;
+  }
+
+  .trash-bg {
+    background-image: radial-gradient(circle at 25% 25%, #10b981 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, #8b5cf6 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, #3b82f6 0%, transparent 50%);
+    background-size: 100px 100px, 150px 150px, 200px 200px;
+    animation: float 20s ease-in-out infinite;
+  }
+
+  .bag-bounce {
+    animation: bagBounce 2s ease-in-out infinite;
+  }
+
+  .trash-spin {
+    animation: trashSpin 3s linear infinite;
+  }
+
+  .pulse-neon {
+    animation: pulseNeon 2s ease-in-out infinite alternate;
+  }
+
+  .falling-item {
+    animation: fall 3s linear infinite;
+  }
+
+  .click-ripple {
+    animation: clickRipple 0.6s ease-out;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-10px) rotate(1deg);
+  }
+  66% {
+    transform: translateY(5px) rotate(-1deg);
+  }
+}
+
+@keyframes bagBounce {
+  0%,
+  100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-10px) scale(1.05);
+  }
+}
+
+@keyframes trashSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulseNeon {
+  from {
+    text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
+  }
+  to {
+    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+  }
+}
+
+@keyframes fall {
+  from {
+    transform: translateY(-100px) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  to {
+    transform: translateY(calc(100vh + 100px)) rotate(360deg);
+    opacity: 1;
+  }
+}
+
+@keyframes clickRipple {
+  from {
+    transform: scale(0);
+    opacity: 1;
+  }
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.slide-in-up {
+  animation: slideInUp 0.6s ease-out;
+}
+
+/* Custom wallet button styles to match our theme */
+.wallet-adapter-button {
+  background: linear-gradient(to right, #10b981, #3b82f6) !important;
+  border: none !important;
+  border-radius: 0.5rem !important;
+  font-weight: bold !important;
+  box-shadow: 0 0 5px currentColor, 0 0 10px currentColor, inset 0 0 5px currentColor !important;
+}
+
+.wallet-adapter-button:hover {
+  background: linear-gradient(to right, #059669, #2563eb) !important;
+}
+
+.wallet-adapter-button-trigger {
+  background: linear-gradient(to right, #10b981, #3b82f6) !important;
+}
+
+.wallet-adapter-modal-wrapper {
+  background: rgba(0, 0, 0, 0.8) !important;
+}
+
+.wallet-adapter-modal {
+  background: #1f2937 !important;
+  border: 1px solid #374151 !important;
+  border-radius: 0.75rem !important;
+}
+
+.wallet-adapter-modal-title {
+  color: #10b981 !important;
+  font-weight: bold !important;
+}
