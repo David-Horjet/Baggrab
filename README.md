@@ -8,6 +8,7 @@ Built for degens, by degens 🗑️⚡
 
 ## 🌍 Live Demo
 
+> 🔗 **Demo Video**: [https://x.com/david_horjet/status/1940806104365387846](https://x.com/david_horjet/status/1940806104365387846)
 > 🔗 **Client**: [https://baggrab.vercel.app](https://baggrab.vercel.app)
 > 🔗 **Server**: [https://baggrab.onrender.com](https://baggrab.onrender.com)
 
