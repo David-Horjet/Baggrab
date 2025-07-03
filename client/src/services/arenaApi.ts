@@ -20,6 +20,7 @@ export interface SubmitArenaScorePayload {
 export interface SubmitArenaScoreResponse {
   status: "success"
   message: "Score submitted"
+  txSignature?: string // Add optional transaction signature
 }
 
 export interface ArenaLeaderboardResponse {
@@ -37,6 +38,7 @@ export interface ArenaStatusResponse {
       | string
       | {
           id: string
+          startTime: string
           endTime: string
           isActive: boolean
         }

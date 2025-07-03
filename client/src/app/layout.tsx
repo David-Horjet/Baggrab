@@ -8,7 +8,7 @@ import ReduxProvider from "@/providers/ReduxProvider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Bag Grab - Solana Mini Game",
+  title: "Bag Grab - Gorbagana Mini Game",
   description: "The trash tide is rising. Grab the bag. Beat your friends. Brag. Repeat.",
 }
 

@@ -6,6 +6,7 @@ import ArenaJoinModal from "@/components/ArenaJoinModal"
 import ArenaLeaderboardPreview from "@/components/ArenaLeaderboardPreview"
 import ArenaSeasonTimer from "@/components/ArenaSeasonTimer"
 import GameCanvas from "@/components/GameCanvas"
+import NoSeasonMessage from "@/components/NoSeasonMessage"
 import ScoreBoardHUD from "@/components/ScoreBoarddHUD"
 import TimerOverlay from "@/components/TimeOverlay"
 import WalletStatus from "@/components/WalletStatus"
@@ -13,10 +14,9 @@ import WalletSync from "@/components/WalletSync"
 import { checkApiHealth, submitScore } from "@/services/api"
 import { getArenaStatus, fetchArenaLeaderboard, submitArenaScore } from "@/services/arenaApi"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
-import { setMode, resetArena, setIsLoadingStatus, setPlayerCount, setTotalPool, setCurrentSeasonId, setSeasonEndTime, setHasJoined, setIsLoadingLeaderboard, setLeaderboard, setStatusError, setSubmitScoreError, setIsSubmittingScore, setLastSubmissionTx } from "@/store/slices/arenaSlice"
+import { setMode, resetArena, setIsLoadingStatus, setPlayerCount, setTotalPool, setCurrentSeasonId, setSeasonStartTime, setSeasonEndTime, setHasJoined, setIsLoadingLeaderboard, setLeaderboard, setStatusError, setSubmitScoreError, setIsSubmittingScore, setLastSubmissionTx } from "@/store/slices/arenaSlice"
 import { resetGame, setGameStarted, updateScore, updateBagCount, updateReactionTime, updateLives, setGameOver, setSubmitError, setSubmittingScore, setSubmissionResponse } from "@/store/slices/gameSlice"
 import { setLeaderboardError } from "@/store/slices/leaderboardSlice"
-import NoSeasonMessage from "@/components/NoSeasonMessage"
 
 interface GameState {
   timeLeft: number
@@ -88,88 +88,96 @@ export default function GameScreen() {
   }, [dispatch])
 
   // Load arena status when entering arena mode
-  useEffect(() => {
-    const loadArenaStatus = async () => {
-      if (mode !== "arena" || !walletAddress) return
+  const loadArenaStatus = useCallback(async () => {
+    if (mode !== "arena" || !walletAddress) return
 
-      dispatch(setIsLoadingStatus(true))
-      try {
-        const statusResponse = await getArenaStatus(walletAddress)
-        const { currentSeason, hasJoined: userHasJoined, playerCount, totalPool } = statusResponse.data
+    dispatch(setIsLoadingStatus(true))
+    try {
+      const statusResponse = await getArenaStatus(walletAddress)
+      const { currentSeason, hasJoined: userHasJoined, playerCount, totalPool } = statusResponse.data
 
-        // Always update player count and total pool
-        dispatch(setPlayerCount(playerCount))
-        dispatch(setTotalPool(totalPool))
+      // Always update player count and total pool
+      dispatch(setPlayerCount(playerCount))
+      dispatch(setTotalPool(totalPool))
 
-        // Handle different currentSeason response formats
-        let seasonId: string | null = null
-        let seasonEndTime: string | null = null
-        let seasonIsActive = true // Default to true if we have a season
+      // Handle different currentSeason response formats
+      let seasonId: string | null = null
+      let seasonStartTime: string | null = null
+      let seasonEndTime: string | null = null
+      let seasonIsActive = true // Default to true if we have a season
 
-        if (currentSeason) {
-          if (typeof currentSeason === "string") {
-            // Backend returns season ID as string
-            seasonId = currentSeason
-            // Set a default end time (24 hours from now) since backend doesn't provide it
-            const defaultEndTime = new Date()
-            defaultEndTime.setHours(defaultEndTime.getHours() + 24)
-            seasonEndTime = defaultEndTime.toISOString()
-          } else if (typeof currentSeason === "object" && currentSeason.id) {
-            // Backend returns season object
-            seasonId = currentSeason.id
-            seasonEndTime = currentSeason.endTime
-            seasonIsActive = currentSeason.isActive
-          }
+      if (currentSeason) {
+        if (typeof currentSeason === "string") {
+          // Backend returns season ID as string
+          seasonId = currentSeason
+          // Set default times if not provided
+          const now = new Date()
+          seasonStartTime = now.toISOString()
+          const defaultEndTime = new Date()
+          defaultEndTime.setHours(defaultEndTime.getHours() + 24)
+          seasonEndTime = defaultEndTime.toISOString()
+        } else if (typeof currentSeason === "object" && currentSeason.id) {
+          // Backend returns season object
+          seasonId = currentSeason.id
+          seasonStartTime = currentSeason.startTime
+          seasonEndTime = currentSeason.endTime
+          seasonIsActive = currentSeason.isActive
         }
-
-        if (seasonId) {
-          dispatch(setCurrentSeasonId(seasonId))
-          dispatch(setSeasonEndTime(seasonEndTime))
-          dispatch(setHasJoined(userHasJoined))
-
-          console.log("Arena Status:", {
-            seasonId,
-            userHasJoined,
-            seasonIsActive,
-            playerCount,
-            totalPool,
-          })
-
-          // Load leaderboard if user has joined
-          if (userHasJoined) {
-            dispatch(setIsLoadingLeaderboard(true))
-            try {
-              const leaderboardResponse = await fetchArenaLeaderboard(seasonId)
-              dispatch(setLeaderboard(leaderboardResponse.data))
-            } catch (error) {
-              console.error("Leaderboard load error:", error)
-              dispatch(setLeaderboardError(error instanceof Error ? error.message : "Failed to load leaderboard"))
-            } finally {
-              dispatch(setIsLoadingLeaderboard(false))
-            }
-          }
-
-          // Show join modal if user hasn't joined and season is active
-          if (!userHasJoined && seasonIsActive) {
-            setLocalGameState((prev) => ({ ...prev, showJoinModal: true }))
-          }
-        } else {
-          // No current season available
-          dispatch(setCurrentSeasonId(null))
-          dispatch(setSeasonEndTime(null))
-          dispatch(setHasJoined(false))
-
-          // Don't show join modal when no season is active
-          setLocalGameState((prev) => ({ ...prev, showJoinModal: false }))
-        }
-      } catch (error) {
-        console.error("Failed to load arena status:", error)
-        dispatch(setStatusError(error instanceof Error ? error.message : "Failed to load arena status"))
-      } finally {
-        dispatch(setIsLoadingStatus(false))
       }
-    }
 
+      if (seasonId) {
+        dispatch(setCurrentSeasonId(seasonId))
+        dispatch(setSeasonStartTime(seasonStartTime))
+        dispatch(setSeasonEndTime(seasonEndTime))
+        dispatch(setHasJoined(userHasJoined))
+
+        console.log("Arena Status:", {
+          seasonId,
+          userHasJoined,
+          seasonIsActive,
+          seasonStartTime,
+          seasonEndTime,
+          playerCount,
+          totalPool,
+        })
+
+        // Load leaderboard if user has joined
+        if (userHasJoined) {
+          dispatch(setIsLoadingLeaderboard(true))
+          try {
+            const leaderboardResponse = await fetchArenaLeaderboard(seasonId)
+            dispatch(setLeaderboard(leaderboardResponse.data))
+          } catch (error) {
+            console.error("Leaderboard load error:", error)
+            dispatch(setLeaderboardError(error instanceof Error ? error.message : "Failed to load leaderboard"))
+          } finally {
+            dispatch(setIsLoadingLeaderboard(false))
+          }
+        }
+
+        // Show join modal if user hasn't joined and season is active
+        if (!userHasJoined && seasonIsActive) {
+          setLocalGameState((prev) => ({ ...prev, showJoinModal: true }))
+        }
+      } else {
+        // No current season available
+        dispatch(setCurrentSeasonId(null))
+        dispatch(setSeasonStartTime(null))
+        dispatch(setSeasonEndTime(null))
+        dispatch(setHasJoined(false))
+
+        // Don't show join modal when no season is active
+        setLocalGameState((prev) => ({ ...prev, showJoinModal: false }))
+      }
+    } catch (error) {
+      console.error("Failed to load arena status:", error)
+      dispatch(setStatusError(error instanceof Error ? error.message : "Failed to load arena status"))
+    } finally {
+      dispatch(setIsLoadingStatus(false))
+    }
+  }, [mode, walletAddress, dispatch])
+
+  useEffect(() => {
     loadArenaStatus()
   }, [mode, walletAddress, dispatch])
 
@@ -279,14 +287,16 @@ export default function GameScreen() {
       dispatch(setSubmitScoreError(null))
 
       try {
-        await submitArenaScore({
+        const response = await submitArenaScore({
           wallet: walletAddress,
           score: currentScore,
           seasonId: currentSeasonId,
         })
 
-        // Set the transaction signature (this would come from the API response in a real implementation)
-        dispatch(setLastSubmissionTx(`arena_score_${Date.now()}`))
+        // Store raw transaction signature from API response
+        // Remove any prefixes and store only the signature
+        const rawSignature = response.txSignature || `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        dispatch(setLastSubmissionTx(rawSignature))
 
         setTimeout(() => {
           router.push("/result")
@@ -303,7 +313,10 @@ export default function GameScreen() {
 
   const handleJoinModalSuccess = () => {
     setLocalGameState((prev) => ({ ...prev, showJoinModal: false }))
-    // Game will start automatically once timer reaches 0 and hasJoined is true
+    // Reload arena status to get updated hasJoined state
+    if (mode === "arena" && walletAddress) {
+      loadArenaStatus()
+    }
   }
 
   const handleJoinModalClose = () => {
@@ -445,7 +458,7 @@ export default function GameScreen() {
             {hasSubmitted && (
               <button
                 onClick={() => router.push("/result")}
-                className="w-full bg-purple-500 hover:bg-purple-600 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-lg sm:text-xl transition-all duration-200 neon-border"
+                className="w-full bg-purple-500 hover:bg-purple-600 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg transition-all duration-200 neon-border"
               >
                 View Results
               </button>

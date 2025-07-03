@@ -62,10 +62,10 @@ export default function ArenaJoinModal({ isOpen, onClose, onSuccess }: ArenaJoin
 
       setTransactionStep("submitting")
 
-      // Call API to join arena with transaction signature
+      // Call API to join arena with raw transaction signature
       const response = await joinArena({
         wallet: publicKey.toString(),
-        txSignature: txSignature,
+        txSignature: txSignature, // Store raw signature without prefixes
       })
 
       // Update Redux state

@@ -6,7 +6,7 @@ import { setMode } from "../store/slices/arenaSlice"
 export default function ModeSelector() {
   const dispatch = useAppDispatch()
   const { mode } = useAppSelector((state) => state.arena)
-  const { connected } = useAppSelector((state) => state.wallet)
+  const { connected } = useAppSelector((state) => state.wallet) // Use Redux state instead of wallet hook
 
   const handleModeChange = (newMode: "solo" | "arena") => {
     dispatch(setMode(newMode))

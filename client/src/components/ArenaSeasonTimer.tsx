@@ -22,13 +22,20 @@ export default function ArenaSeasonTimer() {
         return
       }
 
-      const hours = Math.floor(difference / (1000 * 60 * 60))
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24))
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
       const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
       const seconds = Math.floor((difference % (1000 * 60)) / 1000)
 
-      setTimeLeft(
-        `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`,
-      )
+      if (days > 0) {
+        setTimeLeft(
+          `${days}d ${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`,
+        )
+      } else {
+        setTimeLeft(
+          `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`,
+        )
+      }
       setIsExpired(false)
     }
 
@@ -45,7 +52,7 @@ export default function ArenaSeasonTimer() {
       className={`border rounded-lg px-3 sm:px-4 py-2 backdrop-blur-sm transition-all duration-300 ${
         isExpired
           ? "bg-red-900/80 border-red-500"
-          : timeLeft.startsWith("00:") && Number.parseInt(timeLeft.split(":")[1]) < 10
+          : timeLeft.includes("00:") && timeLeft.split(":")[1] && Number.parseInt(timeLeft.split(":")[1]) < 10
             ? "bg-orange-900/80 border-orange-500 animate-pulse"
             : "bg-purple-900/80 border-purple-500"
       }`}
@@ -58,7 +65,7 @@ export default function ArenaSeasonTimer() {
           className={`text-lg sm:text-xl font-black pixel-font ${
             isExpired
               ? "text-red-400"
-              : timeLeft.startsWith("00:") && Number.parseInt(timeLeft.split(":")[1]) < 10
+              : timeLeft.includes("00:") && timeLeft.split(":")[1] && Number.parseInt(timeLeft.split(":")[1]) < 10
                 ? "text-orange-400"
                 : "text-purple-400"
           }`}

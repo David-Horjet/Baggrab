@@ -8,6 +8,7 @@ export interface ArenaPlayer {
 export interface ArenaState {
   mode: "solo" | "arena"
   currentSeasonId: string | null
+  seasonStartTime: string | null
   seasonEndTime: string | null
   leaderboard: ArenaPlayer[]
   hasJoined: boolean
@@ -27,6 +28,7 @@ export interface ArenaState {
 const initialState: ArenaState = {
   mode: "solo",
   currentSeasonId: null,
+  seasonStartTime: null,
   seasonEndTime: null,
   leaderboard: [],
   hasJoined: false,
@@ -52,6 +54,9 @@ const arenaSlice = createSlice({
     },
     setCurrentSeasonId: (state, action: PayloadAction<string | null>) => {
       state.currentSeasonId = action.payload
+    },
+    setSeasonStartTime: (state, action: PayloadAction<string | null>) => {
+      state.seasonStartTime = action.payload
     },
     setSeasonEndTime: (state, action: PayloadAction<string | null>) => {
       state.seasonEndTime = action.payload
@@ -105,6 +110,7 @@ const arenaSlice = createSlice({
       state.lastSubmissionTx = null
       state.leaderboard = []
       state.currentSeasonId = null
+      state.seasonStartTime = null
       state.seasonEndTime = null
       state.playerCount = 0
       state.totalPool = 0
@@ -115,6 +121,7 @@ const arenaSlice = createSlice({
 export const {
   setMode,
   setCurrentSeasonId,
+  setSeasonStartTime,
   setSeasonEndTime,
   setHasJoined,
   setIsJoining,
