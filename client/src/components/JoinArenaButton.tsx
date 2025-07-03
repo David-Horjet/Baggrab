@@ -1,16 +1,16 @@
 "use client"
 
-import { joinArena } from "@/services/arenaApi"
-import { setIsJoining, setJoinError, setHasJoined, setPlayerCount, setTotalGorPool } from "@/store/slices/arenaSlice"
 import { useAppSelector, useAppDispatch } from "../store/hooks"
+import { setIsJoining, setJoinError, setHasJoined } from "../store/slices/arenaSlice"
+import { joinArena } from "../services/arenaApi"
 
 export default function JoinArenaButton() {
   const dispatch = useAppDispatch()
   const { address: walletAddress } = useAppSelector((state) => state.wallet)
-  const { hasJoined, isJoining, joinError, currentSeason } = useAppSelector((state) => state.arena)
+  const { hasJoined, isJoining, joinError, currentSeasonId } = useAppSelector((state) => state.arena)
 
   const handleJoinArena = async () => {
-    if (!walletAddress || isJoining || hasJoined || !currentSeason.isActive) return
+    if (!walletAddress || isJoining || hasJoined || !currentSeasonId) return
 
     dispatch(setIsJoining(true))
     dispatch(setJoinError(null))
@@ -18,12 +18,12 @@ export default function JoinArenaButton() {
     try {
       const response = await joinArena({
         wallet: walletAddress,
-        seasonId: currentSeason.id,
+        txSignature: `temp_${Date.now()}`, // Temporary signature for now
       })
 
       dispatch(setHasJoined(true))
-      dispatch(setPlayerCount(response.data.playerCount))
-      dispatch(setTotalGorPool(response.data.totalGorPool))
+      // Note: The API response doesn't include playerCount and totalPool
+      // These would need to be fetched separately or the API updated
     } catch (error) {
       console.error("Arena join error:", error)
       const errorMessage = error instanceof Error ? error.message : "Failed to join arena"
@@ -44,7 +44,7 @@ export default function JoinArenaButton() {
     )
   }
 
-  if (!currentSeason.isActive) {
+  if (!currentSeasonId) {
     return (
       <div className="bg-gray-600/50 border border-gray-500 rounded-lg px-4 sm:px-6 py-3 backdrop-blur-sm opacity-50">
         <div className="text-center">

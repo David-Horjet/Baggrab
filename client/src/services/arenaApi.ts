@@ -9,6 +9,10 @@ export interface JoinArenaResponse {
   status: "success"
   message: "Joined arena"
   seasonId: string
+  data?: {
+    playerCount: number
+    totalPool: number
+  }
 }
 
 export interface SubmitArenaScorePayload {

@@ -4,16 +4,16 @@ import { useState, useEffect } from "react"
 import { useAppSelector } from "../store/hooks"
 
 export default function SeasonTimer() {
-  const { currentSeason } = useAppSelector((state) => state.arena)
+  const { currentSeasonId, seasonEndTime } = useAppSelector((state) => state.arena)
   const [timeLeft, setTimeLeft] = useState("")
   const [isExpired, setIsExpired] = useState(false)
 
   useEffect(() => {
     const updateTimer = () => {
-      if (!currentSeason.endTime) return
+      if (!seasonEndTime) return
 
       const now = new Date().getTime()
-      const endTime = new Date(currentSeason.endTime).getTime()
+      const endTime = new Date(seasonEndTime).getTime()
       const difference = endTime - now
 
       if (difference <= 0) {
@@ -36,9 +36,9 @@ export default function SeasonTimer() {
     const interval = setInterval(updateTimer, 1000)
 
     return () => clearInterval(interval)
-  }, [currentSeason.endTime])
+  }, [seasonEndTime])
 
-  if (!currentSeason.isActive) {
+  if (!currentSeasonId) {
     return (
       <div className="bg-gray-800/80 border border-gray-600 rounded-lg px-3 sm:px-4 py-2 backdrop-blur-sm">
         <div className="text-center">

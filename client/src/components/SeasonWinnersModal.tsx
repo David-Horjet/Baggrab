@@ -1,11 +1,11 @@
 "use client"
 
-import { setShowWinnersModal } from "@/store/slices/arenaSlice"
 import { useAppSelector, useAppDispatch } from "../store/hooks"
+import { setShowWinnersModal } from "../store/slices/arenaSlice"
 
 export default function SeasonWinnersModal() {
   const dispatch = useAppDispatch()
-  const { winners, showWinnersModal, totalGorPool } = useAppSelector((state) => state.arena)
+  const { winners, showWinnersModal, totalPool } = useAppSelector((state) => state.arena)
 
   const formatWalletAddress = (address: string) => {
     if (address.length <= 8) return address
@@ -51,7 +51,7 @@ export default function SeasonWinnersModal() {
             </h2>
             <p className="text-gray-300 text-sm sm:text-base">Congratulations to our champions!</p>
             <div className="mt-2 bg-yellow-500/20 border border-yellow-500 rounded-lg px-3 py-1 inline-block">
-              <span className="text-yellow-400 text-xs font-bold">Total Pool: {totalGorPool} GOR</span>
+              <span className="text-yellow-400 text-xs font-bold">Total Pool: {totalPool} GOR</span>
             </div>
           </div>
         </div>

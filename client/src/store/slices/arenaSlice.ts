@@ -23,6 +23,13 @@ export interface ArenaState {
   totalPool: number
   isLoadingStatus: boolean
   statusError: string | null
+  winners: Array<{
+    wallet: string
+    position: number
+    score: number
+    reward: number
+  }>
+  showWinnersModal: boolean
 }
 
 const initialState: ArenaState = {
@@ -43,6 +50,8 @@ const initialState: ArenaState = {
   totalPool: 0,
   isLoadingStatus: false,
   statusError: null,
+  winners: [],
+  showWinnersModal: false,
 }
 
 const arenaSlice = createSlice({
@@ -115,6 +124,22 @@ const arenaSlice = createSlice({
       state.playerCount = 0
       state.totalPool = 0
     },
+    setWinners: (
+      state,
+      action: PayloadAction<
+        Array<{
+          wallet: string
+          position: number
+          score: number
+          reward: number
+        }>
+      >,
+    ) => {
+      state.winners = action.payload
+    },
+    setShowWinnersModal: (state, action: PayloadAction<boolean>) => {
+      state.showWinnersModal = action.payload
+    },
   },
 })
 
@@ -137,6 +162,8 @@ export const {
   setIsLoadingStatus,
   setStatusError,
   resetArena,
+  setWinners,
+  setShowWinnersModal,
 } = arenaSlice.actions
 
 export default arenaSlice.reducer
