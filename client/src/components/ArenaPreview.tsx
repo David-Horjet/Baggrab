@@ -2,21 +2,47 @@
 
 import { useEffect } from "react"
 import { useAppSelector, useAppDispatch } from "../store/hooks"
-import { getArenaStatus } from "@/services/arenaApi"
-import { setCurrentSeason, setPlayerCount, setTotalGorPool } from "@/store/slices/arenaSlice"
+import {
+  setCurrentSeasonId,
+  setSeasonStartTime,
+  setSeasonEndTime,
+  setPlayerCount,
+  setTotalPool,
+} from "../store/slices/arenaSlice"
+import { getArenaStatus } from "../services/arenaApi"
 
 export default function ArenaPreview() {
   const dispatch = useAppDispatch()
-  const { playerCount, totalGorPool, currentSeason } = useAppSelector((state) => state.arena)
+  const { playerCount, totalPool, currentSeasonId, seasonEndTime } = useAppSelector((state) => state.arena)
   const { address: walletAddress } = useAppSelector((state) => state.wallet)
 
   useEffect(() => {
     const loadArenaPreview = async () => {
       try {
         const response = await getArenaStatus()
-        dispatch(setCurrentSeason(response.data.season))
-        dispatch(setPlayerCount(response.data.playerCount))
-        dispatch(setTotalGorPool(response.data.totalGorPool))
+        const { currentSeason, playerCount, totalPool } = response.data
+
+        // Handle different currentSeason response formats
+        if (currentSeason) {
+          if (typeof currentSeason === "string") {
+            // Backend returns season ID as string
+            dispatch(setCurrentSeasonId(currentSeason))
+            // Set default times if not provided
+            const now = new Date()
+            dispatch(setSeasonStartTime(now.toISOString()))
+            const defaultEndTime = new Date()
+            defaultEndTime.setHours(defaultEndTime.getHours() + 24)
+            dispatch(setSeasonEndTime(defaultEndTime.toISOString()))
+          } else if (typeof currentSeason === "object" && currentSeason.id) {
+            // Backend returns season object
+            dispatch(setCurrentSeasonId(currentSeason.id))
+            dispatch(setSeasonStartTime(currentSeason.startTime))
+            dispatch(setSeasonEndTime(currentSeason.endTime))
+          }
+        }
+
+        dispatch(setPlayerCount(playerCount))
+        dispatch(setTotalPool(totalPool))
       } catch (error) {
         console.error("Failed to load arena preview:", error)
       }
@@ -26,10 +52,10 @@ export default function ArenaPreview() {
   }, [dispatch])
 
   const getTimeLeft = () => {
-    if (!currentSeason.endTime) return "00:00:00"
+    if (!seasonEndTime) return "00:00:00"
 
     const now = new Date().getTime()
-    const endTime = new Date(currentSeason.endTime).getTime()
+    const endTime = new Date(seasonEndTime).getTime()
     const difference = endTime - now
 
     if (difference <= 0) return "Season Ended"
@@ -56,15 +82,15 @@ export default function ArenaPreview() {
 
         <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 text-center">
           <div className="text-yellow-400 font-bold text-sm">Prize Pool</div>
-          <div className="text-yellow-300 font-black pixel-font text-lg">{totalGorPool} GOR</div>
+          <div className="text-yellow-300 font-black pixel-font text-lg">{totalPool} GOR</div>
         </div>
       </div>
 
       <div className="text-center">
         <div className="text-gray-300 text-sm mb-2">🪙 {playerCount} players competing • Top 3 win rewards</div>
         <div className="text-xs text-gray-400">
-          1st: {Math.floor(totalGorPool * 0.6)} GOR • 2nd: {Math.floor(totalGorPool * 0.3)} GOR • 3rd:{" "}
-          {Math.floor(totalGorPool * 0.1)} GOR
+          1st: {Math.floor(totalPool * 0.6)} GOR • 2nd: {Math.floor(totalPool * 0.3)} GOR • 3rd:{" "}
+          {Math.floor(totalPool * 0.1)} GOR
         </div>
       </div>
     </div>
