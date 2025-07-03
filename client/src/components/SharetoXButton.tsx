@@ -3,11 +3,15 @@
 interface ShareToXButtonProps {
   score: number
   rank: number
+  mode?: "solo" | "arena"
 }
 
-export default function ShareToXButton({ score, rank }: ShareToXButtonProps) {
+export default function ShareToXButton({ score, rank, mode = "solo" }: ShareToXButtonProps) {
   const handleShare = () => {
-    const text = `Just secured the bag in Bag Grab! 💰\n\nScore: ${score.toLocaleString()}\nRank: #${rank}\n\nThink you can beat me? 🎯\n\n#BagGrab #Solana #GameFi #Gorbagana`
+    const modeText = mode === "arena" ? "arena competition" : "solo run"
+    const modeEmoji = mode === "arena" ? "🏟️" : "🎯"
+
+    const text = `Just ${mode === "arena" ? "dominated the arena" : "secured the bag"} in Bag Grab! ${modeEmoji}\n\nScore: ${score.toLocaleString()}\nRank: #${rank}\nMode: ${mode.toUpperCase()}\n\nThink you can beat me? 💪\n\n#BagGrab #Solana #GameFi #Gorbagana`
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
     window.open(url, "_blank")
   }
