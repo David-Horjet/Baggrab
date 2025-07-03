@@ -41,7 +41,7 @@ export default function LeaderboardDisplay() {
         )
       }
     })
-  }, [])
+  }, [dispatch, loadLeaderboard])
 
   useEffect(() => {
     if (!apiHealthy) return
@@ -51,7 +51,7 @@ export default function LeaderboardDisplay() {
     }, 30000)
 
     return () => clearInterval(interval)
-  }, [apiHealthy])
+  }, [apiHealthy, loadLeaderboard])
 
   const formatWalletAddress = (address: string) => {
     if (address.length <= 8) return address

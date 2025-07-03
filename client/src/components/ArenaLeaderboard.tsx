@@ -3,13 +3,10 @@
 import { useAppSelector } from "../store/hooks"
 
 export default function ArenaLeaderboard() {
-  const { players, currentSeason } = useAppSelector((state) => state.arena)
+  const { leaderboard, currentSeasonId } = useAppSelector((state) => state.arena)
   const { address: walletAddress } = useAppSelector((state) => state.wallet)
 
-  const sortedPlayers = [...players]
-    .filter((player) => player.isActive)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 10)
+  const sortedPlayers = [...leaderboard].sort((a, b) => b.score - a.score).slice(0, 10)
 
   const formatWalletAddress = (address: string) => {
     if (address.length <= 8) return address
@@ -42,7 +39,7 @@ export default function ArenaLeaderboard() {
     }
   }
 
-  if (!currentSeason.isActive && sortedPlayers.length === 0) {
+  if (!currentSeasonId && sortedPlayers.length === 0) {
     return (
       <div className="bg-gray-900/80 border border-gray-700 rounded-lg p-4 sm:p-6 backdrop-blur-sm">
         <h3 className="pixel-font text-lg sm:text-xl font-bold text-gray-400 mb-4 text-center">🏟️ ARENA LEADERBOARD</h3>
@@ -81,17 +78,17 @@ export default function ArenaLeaderboard() {
       <div className="space-y-2">
         {sortedPlayers.map((player, index) => (
           <div
-            key={player.wallet}
+            key={player._id}
             className={`flex items-center justify-between p-2 sm:p-3 rounded-lg border transition-all duration-200 ${getRankStyle(index)} ${
-              player.wallet === walletAddress ? "ring-2 ring-emerald-500" : ""
+              player._id === walletAddress ? "ring-2 ring-emerald-500" : ""
             }`}
           >
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <span className="text-lg sm:text-xl flex-shrink-0">{getRankIcon(index)}</span>
               <div className="min-w-0">
                 <div className="font-bold text-xs sm:text-sm pixel-font truncate">
-                  #{index + 1} {formatWalletAddress(player.wallet)}
-                  {player.wallet === walletAddress && " (You)"}
+                  #{index + 1} {formatWalletAddress(player._id)}
+                  {player._id === walletAddress && " (You)"}
                 </div>
                 {index <= 2 && (
                   <div className="text-xs opacity-75">

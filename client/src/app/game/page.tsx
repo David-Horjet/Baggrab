@@ -179,7 +179,7 @@ export default function GameScreen() {
 
   useEffect(() => {
     loadArenaStatus()
-  }, [mode, walletAddress, dispatch])
+  }, [mode, walletAddress, loadArenaStatus, dispatch])
 
   // Auto-hide sidebar on mobile, show on desktop
   useEffect(() => {
